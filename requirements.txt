@@ -1,0 +1,6 @@
+keyboard
+mouse
+pygetwindow
+pywin32
+pypiwin32
+winshell

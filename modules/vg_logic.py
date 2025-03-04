@@ -1,8 +1,7 @@
-import keyboard, mouse, time
+import keyboard, mouse, time, pygame, os
 import pygetwindow as gw
-import pygame
 
-from scope_overlay import ImageOverlay
+from modules.scope_overlay import ImageOverlay
 
 
 def kill_pressed_program():
@@ -26,8 +25,9 @@ def init_sounds():
     pygame.mixer.set_num_channels(2)  # Set up 2 channels
     
     # Load the sound files
-    prep_sound = pygame.mixer.Sound(r"assets\prep_sfx.mp3")
-    shoot_sound = pygame.mixer.Sound(r"assets\shoot_sfx.mp3")
+    
+    prep_sound = pygame.mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'prep_sfx.mp3'))
+    shoot_sound = pygame.mixer.Sound(os.path.join(os.path.dirname(__file__), '..', 'assets', 'shoot_sfx.mp3'))
     return prep_sound, shoot_sound
 
 def play_sound(sound):
@@ -36,15 +36,15 @@ def play_sound(sound):
     if channel:
         channel.play(sound)
 
-def main():
+def run_program():
     prep_sound, shoot_sound = init_sounds()
-
-    image_file = r"assets\scope.png"
+    
+    image_file = os.path.join(os.path.dirname(__file__), '..', 'assets', 'scope.png')
     overlay = ImageOverlay(image_file)
     overlay.running = False
 
     while True:
-        if keyboard.is_pressed('alt+k'):
+        if keyboard.is_pressed('alt+q'):
             overlay.prep_ui()
             play_sound(prep_sound)
 
@@ -65,6 +65,3 @@ def main():
         
 
         time.sleep(0.1)  # Reduce CPU usage while waiting
-
-if __name__ == '__main__':
-    main()
