@@ -1,61 +1,70 @@
-import tkinter as tk
-import pyautogui
-from PIL import Image, ImageTk
-import keyboard
+import keyboard, mouse, time
+import pygetwindow as gw
+import pygame
 
-class ImageOverlay:
-    def __init__(self, image_path):
-        # Get screen dimensions
-        screen_width, screen_height = pyautogui.size()
-        target_size = int(screen_width * 0.10)  # 10% of screen width
-        
-        self.root = tk.Tk()
-        self.root.overrideredirect(True)
-        self.root.wm_attributes("-topmost", True)
-        self.root.wm_attributes("-transparentcolor", "white")
-        self.root.bind('<Escape>', self.stop_following)
-        
-        try:
-            # Load and resize image
-            original_img = Image.open(image_path)
-            ratio = min(target_size / original_img.width, target_size / original_img.height)
-            new_size = (int(original_img.width * ratio), int(original_img.height * ratio))
-            self.img = original_img.resize(new_size, Image.Resampling.LANCZOS)
-            self.photo = ImageTk.PhotoImage(self.img)
-        except Exception as e:
-            print(f"Error opening image: {e}")
-            self.root.destroy()
-            return
-        
-        self.image_width = self.img.width
-        self.image_height = self.img.height
+from scope_overlay import ImageOverlay
 
-        self.label = tk.Label(self.root, image=self.photo, bg="white", bd=0, highlightthickness=0)
-        self.label.pack()
-        
-        self.running = True
-        self.update_position()
 
-    def stop_following(self, event=None):
-        print("Stopping overlay...")
-        self.running = False
-        self.root.destroy()
+def kill_pressed_program():
+    time.sleep(0.1)
 
-    def update_position(self):
-        if self.running:
-            x, y = pyautogui.position()
-            self.root.geometry(f"+{x - self.image_width // 2}+{y - self.image_height // 2}")
-            self.root.after(10, self.update_position)
+    try:
+        active_window = gw.getActiveWindow()
+    except:
+        active_window = None
+
+
+    if active_window:
+        print(f"Killing: {active_window.title}")
+        active_window.close()
+        time.sleep(0.5)
+    else:
+        print("No active window found.")
+
+def init_sounds():
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(2)  # Set up 2 channels
+    
+    # Load the sound files
+    prep_sound = pygame.mixer.Sound(r"assets\prep_sfx.mp3")
+    shoot_sound = pygame.mixer.Sound(r"assets\shoot_sfx.mp3")
+    return prep_sound, shoot_sound
+
+def play_sound(sound):
+    # Find first available channel and play
+    channel = pygame.mixer.find_channel()
+    if channel:
+        channel.play(sound)
 
 def main():
+    prep_sound, shoot_sound = init_sounds()
+
     image_file = r"assets\scope.png"
     overlay = ImageOverlay(image_file)
-    
-    while overlay.running:
-        overlay.root.update_idletasks()
-        overlay.root.update()
-        if keyboard.is_pressed('esc'):
-            overlay.stop_following()
+    overlay.running = False
+
+    while True:
+        if keyboard.is_pressed('alt+k'):
+            overlay.prep_ui()
+            play_sound(prep_sound)
+
+        while overlay.running:
+            overlay.root.update_idletasks()
+            overlay.root.update()
+
+            if keyboard.is_pressed('esc'):
+                overlay.running = False
+                overlay.stop_following()
+            
+            if mouse.is_pressed(button='left'):
+                overlay.running = False
+                overlay.stop_following()
+                play_sound(shoot_sound)
+
+                kill_pressed_program()
+        
+
+        time.sleep(0.1)  # Reduce CPU usage while waiting
 
 if __name__ == '__main__':
     main()
