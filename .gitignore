@@ -1,4 +1,56 @@
-/__pycache__/
-/.vscode/
-modules/__pycache__/
-modules/.vscode/
+*.bat
+*.pyc
+
+*/__pycache__/
+*/.vscode/
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.eggs/
+dist/
+sdist/
+*.egg-info/
+*.egg
+*.whl
+build/
+develop-eggs/
+MANIFEST
+
+# PyInstaller
+/dist/
+/build/
+/*.spec
+
+# Environments
+.venv
+venv/
+ENV/
+env/
+*/env/
+*/ENV/
+.virtualenv/
+*/.venv/
+*/.virtualenv/
+
+# Spyder project
+.spyderproject
+.spyproject
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Others
+*.log
+*.bak
+*~
+\#*#
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
